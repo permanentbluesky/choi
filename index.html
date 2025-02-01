@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방명록 편지 웹사이트</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu&family=Nanum+Myeongjo&family=Gamja+Flower&family=Nanum+Gothic&family=Gloock&family=Yoon+Gothic&family=Jua&family=Seoul+Namsan&family=DoHyeon&family=Batang&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #87CEEB;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Akzidenz Grotesk', sans-serif;
+            margin: 0;
+        }
+        .envelope {
+            position: relative;
+            width: 350px;
+            height: 250px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #d3d3d3;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transition: transform 0.5s ease-in-out;
+            transform-origin: top;
+        }
+        .letter {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 80%;
+            background-color: white;
+            padding: 10px;
+            transform: translateX(-50%);
+            transition: top 0.5s ease-in-out;
+            border-radius: 5px;
+        
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-family: inherit;
+            resize: none;
+        }
+        button {
+            margin-top: 5px;  /* 버튼과 텍스트 박스 사이 간격을 줄였어요 */
+            padding: 8px 12px;
+            font-size: 14px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .envelope.open .flap {
+            transform: rotateX(180deg);
+        }
+        .envelope.open .letter {
+            top: 30%;
+        }
+        .guestbook {
+            margin-top: 20px;
+            width: 300px;
+            background: white;
+            padding: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .guestbook ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .guestbook li {
+            background: #f9f9f9;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="envelope" onclick="toggleEnvelope()">
+        <div class="flap"></div>
+        <div class="letter">
+            <textarea id="message" placeholder="여기에 편지를 입력하세요..."></textarea>
+            <button onclick="addMessage(event)">작성</button>
+        </div>
+    </div>
+
+    <div class="guestbook">
+        <h3>📜 방명록</h3>
+        <ul id="messages"></ul>
+    </div>
+    
+    <script>
+        const fonts = [
+            "Gaegu, sans-serif",
+            "Nanum Myeongjo, serif",
+            "Gamja Flower, cursive",
+            "Nanum Gothic, sans-serif",
+            "Gloock, sans-serif",
+            "Yoon Gothic, sans-serif",
+            "Jua, sans-serif",
+            "Seoul Namsan, sans-serif",
+            "DoHyeon, sans-serif",
+            "Batang, serif"
+        ];
+
+        function toggleEnvelope() {
+            document.querySelector(".envelope").classList.toggle("open");
+        }
+
+        function addMessage(event) {
+            event.stopPropagation(); // 클릭 이벤트가 상위로 전달되지 않도록 방지
+            let messageText = document.getElementById("message").value;
+            
+            if (!messageText.trim()) {
+                alert("빈 편지는 작성할 수 없어요!");
+                return;
+            }
+
+            let messageList = document.getElementById("messages");
+            let newMessage = document.createElement("li");
+            newMessage.textContent = messageText;
+
+            // 랜덤 폰트 적용
+            newMessage.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
+
+            messageList.appendChild(newMessage);
+            document.getElementById("message").value = "";
+
+            saveMessage(messageText);
+        }
+
+        function saveMessage(text) {
+            let messages = JSON.parse(localStorage.getItem("messages")) || [];
+            messages.push(text);
+            localStorage.setItem("messages", JSON.stringify(messages));
+        }
+
+        function loadMessages() {
+            let savedMessages = JSON.parse(localStorage.getItem("messages")) || [];
+            const messageList = document.getElementById("messages");
+
+            savedMessages.forEach(text => {
+                let newMessage = document.createElement("li");
+                newMessage.textContent = text;
+                newMessage.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
+                messageList.appendChild(newMessage);
+            });
+        }
+
+        window.onload = loadMessages;
+    </script>
+
+</body>
+</html>
